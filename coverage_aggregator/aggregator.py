@@ -5,10 +5,10 @@ import re
 from collections import namedtuple
 import shutil
 from datetime import datetime
-import json
 
 from jinja2 import Environment, FileSystemLoader
 
+from .badge_generator import make_badge
 
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 TEMPLATES_PATH = os.path.abspath(os.path.join(FILE_PATH, 'templates'))
@@ -39,7 +39,7 @@ def aggregate():
     copy_static(outpath)
     copy_reports(path, outpath)
     generate_index(scores, total, outpath)
-    make_badge_json(scores, total, outpath)
+    make_badge(total.coverage, outpath)
 
 
 def aggregate_reports(path):
@@ -94,43 +94,3 @@ def copy_reports(path, outpath):
     for package, report in zip(packages, html_reports):
         report_outpath = os.path.join(outpath, package)
         shutil.copytree(report, report_outpath)
-
-
-def make_badge_json(scores, total, outpath):
-    data = {}
-    data['total'] = {
-        'coverage': total.coverage,
-        'color': get_badge_color(total.coverage)
-    }
-
-    for package, score in scores.items():
-        data[package] = {
-            'coverage': score.coverage,
-            'color': get_badge_color(score.coverage)
-        }
-
-    with open(os.path.join(outpath, 'badges.json'), 'w') as f:
-        json.dump(data, f)
-
-
-COLORS = {
-    'green': '#28A745',
-    'yellowgreen': '#A4A61D',
-    'yellow': '#E9BF25',
-    'orange': '#FE7B34',
-    'red': '#CB2431',
-}
-
-COLOR_RANGES = [
-    (90, 'green'),
-    (75, 'yellowgreen'),
-    (60, 'yellow'),
-    (40, 'orange'),
-    (0, 'red'),
-]
-
-
-def get_badge_color(total):
-    for mininum, color in COLOR_RANGES:
-        if total >= mininum:
-            return COLORS[color]
