@@ -44,7 +44,7 @@ def aggregate():
 
 def aggregate_reports(path):
     html_reports = glob.glob(os.path.join(path, '*', 'coverage.html'))
-    packages = [os.path.basename(os.path.dirname(p)) for p in html_reports]
+    packages = sorted([os.path.basename(os.path.dirname(p)) for p in html_reports])
     scores = {}
 
     total = [0] * 8
