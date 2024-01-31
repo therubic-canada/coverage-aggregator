@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100" height="20">
-  <title>build - passing</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="110" height="20">
+  <title>coverage - {{ total }}%</title>
   <defs>
     <linearGradient id="workflow-fill" x1="50%" y1="0%" x2="50%" y2="100%">
       <stop stop-color="#444D56" offset="0%"></stop>
@@ -11,7 +11,7 @@
     </linearGradient>
   </defs>
   <g fill="none" fill-rule="evenodd">
-    <g transform="translate(50)" font-family="&#39;DejaVu Sans&#39;,Verdana,Geneva,sans-serif" font-size="11">
+    <g transform="translate(60)" font-family="&#39;DejaVu Sans&#39;,Verdana,Geneva,sans-serif" font-size="11">
       <path d="M0 0h46.939C48.629 0 50 1.343 50 3v14c0 1.657-1.37 3-3.061 3H0V0z" id="state-bg" fill="url(#state-fill)" fill-rule="nonzero"></path>
       <text fill="#010101" fill-opacity=".3" aria-hidden="true">
         <tspan x="19" y="15">{{ total }}%</tspan>
@@ -21,14 +21,15 @@
       </text>
     </g>
     <g font-family="&#39;DejaVu Sans&#39;,Verdana,Geneva,sans-serif" font-size="11">
-      <path id="workflow-bg" d="M0,3 C0,1.3431 1.3552,0 3.02702703,0 L64,0 L64,20 L3.02702703,20 C1.3552,20 0,18.6569 0,17 L0,3 Z" fill="url(#workflow-fill)" fill-rule="nonzero"></path>
+      <path id="workflow-bg" d="M0,3 C0,1.3431 1.3552,0 3.02702703,0 L74,0 L74,20 L3.02702703,20 C1.3552,20 0,18.6569 0,17 L0,3 Z" fill="url(#workflow-fill)" fill-rule="nonzero"></path>
       <text fill="#010101" fill-opacity=".3">
-        <tspan x="6" y="15" aria-hidden="true">coverage</tspan>
+        <tspan x="20" y="15" aria-hidden="true">coverage</tspan>
       </text>
       <text fill="#FFFFFF">
-        <tspan x="6" y="14">coverage</tspan>
+        <tspan x="20" y="14">coverage</tspan>
       </text>
     </g>
+    <path fill="#959DA5" d="M 10.862916,3.07854 C 10.749166,3.02709 10.627291,3 10.5,3 10.372708,3 10.250834,3.02708 10.137084,3.07854 L 5.0373023,5.242494 c -0.595833,0.251874 -1.039999,0.839581 -1.03729,1.549164 0.01354,2.686661 1.11854,7.602277 5.78499,9.836648 0.4522897,0.216666 0.9777057,0.216666 1.4299957,0 4.66645,-2.234371 5.771448,-7.149987 5.78499,-9.836648 0.0027,-0.709583 -0.441458,-1.29729 -1.03729,-1.549164 z M 7.4666733,8.993529 c 0,-0.915415 0.742081,-1.660206 1.660205,-1.660206 0.438749,0 0.861248,0.176042 1.1727057,0.484791 L 10.5,8.018531 10.700416,7.818114 c 0.311458,-0.311457 0.733958,-0.484791 1.172706,-0.484791 0.915416,0 1.660206,0.742082 1.660206,1.660206 0,0.438749 -0.176042,0.861248 -0.484791,1.172706 l -2.239788,2.239787 c -0.167916,0.167916 -0.444166,0.167916 -0.612082,0 L 7.9568793,10.166235 C 7.6454223,9.854777 7.4720893,9.432278 7.4720893,8.993529 Z" />
   </g>
 </svg>
 
