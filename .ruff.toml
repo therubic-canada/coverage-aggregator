@@ -1,0 +1,45 @@
+line-length = 80
+indent-width = 4
+
+target-version = "py38"
+
+[format]
+quote-style = "single"
+indent-style = "space"
+line-ending = "auto"
+
+[lint]
+preview = true
+
+select = ["ALL"]
+ignore = [
+    # These will eventually be enabled
+    "ANN",       # Type annotations
+    "T201",      # Use of print statements
+    "D1",        # Docstring
+    # These will not
+    "PLR09",     # Too many X variables
+    "SIM105",    # Use contextlib.supress
+    "DTZ",       # Timezone in datetime
+    "PYI",       # Type hinting
+    "TID252",    # Prefer absolute imports
+    "RSE102",    # Unnecessary parentheses on raised exceptions
+    "TRY",
+    "EM",
+    "CPY",
+    "PTH",
+    "FURB101"
+]
+
+[lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "single"
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.isort]
+force-sort-within-sections = true
+
+[lint.per-file-ignores]
+"setup.py" = ["D1"]

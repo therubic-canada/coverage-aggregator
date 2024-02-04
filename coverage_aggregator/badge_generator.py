@@ -19,7 +19,6 @@
 # SOFTWARE.
 import os
 
-
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 TEMPLATES_PATH = os.path.abspath(os.path.join(FILE_PATH, 'templates'))
 
@@ -45,19 +44,20 @@ def get_color(total):
         if total >= range_:
             return COLORS[color]
 
+    return None
+
 
 def get_badge(total, color):
     badge_template_path = os.path.join(TEMPLATES_PATH, 'badge.svg')
-    with open(badge_template_path) as f:
+    with open(badge_template_path, encoding='utf-8') as f:
         template = f.read()
     template = template.replace('{{ total }}', str(total))
     template = template.replace('{{ color_dark }}', color[0])
-    template = template.replace('{{ color_light }}', color[1])
-    return template
+    return template.replace('{{ color_light }}', color[1])
 
 
 def save_badge(badge, outpath):
-    with open(os.path.join(outpath, 'badge.svg'), 'w') as f:
+    with open(os.path.join(outpath, 'badge.svg'), 'w', encoding='utf-8') as f:
         f.write(badge)
 
 

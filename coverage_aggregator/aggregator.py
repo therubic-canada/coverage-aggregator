@@ -1,14 +1,17 @@
+from collections import namedtuple
+from datetime import datetime
 import glob
 import os
-import sys
 import re
-from collections import namedtuple
 import shutil
-from datetime import datetime
+import sys
 
 from jinja2 import Environment, FileSystemLoader
+import pkg_resources
 
 from .badge_generator import make_badge
+
+VERSION = pkg_resources.require('coverage-aggregator')[0].version
 
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 TEMPLATES_PATH = os.path.abspath(os.path.join(FILE_PATH, 'templates'))
@@ -25,8 +28,8 @@ Score = namedtuple(
         'partial',
         'numerator',
         'denominator',
-        'coverage'
-    ]
+        'coverage',
+    ],
 )
 
 
@@ -62,23 +65,24 @@ def aggregate_reports(path):
 
 
 def extract_score(path):
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         text = f.read()
 
     regex = re.compile(
         r'<tr class="total">' + r'.*?(\d+)' * 8 + r'.*?</tr>',
-        re.DOTALL
+        re.DOTALL,
     )
     match = regex.search(text)
     return Score(*[int(match.group(i)) for i in range(1, 9)])
 
 
 def generate_index(scores, total, outpath):
-    env = Environment(loader=FileSystemLoader(TEMPLATES_PATH))
+    env = Environment(loader=FileSystemLoader(TEMPLATES_PATH), autoescape=True)
     template = env.get_template('index.html')
     date_string = datetime.now().strftime('%Y-%m-%d %H:%M')
-    page = template.render(scores=scores, total=total, date_string=date_string)
-    with open(os.path.join(outpath, 'index.html'), 'w') as f:
+    page = template.render(
+        scores=scores, total=total, date_string=date_string, version=VERSION)
+    with open(os.path.join(outpath, 'index.html'), 'w', encoding='utf-8') as f:
         f.write(page)
 
 
