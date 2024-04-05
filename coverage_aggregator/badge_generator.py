@@ -17,10 +17,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import os
+from pathlib import Path
 
-FILE_PATH = os.path.dirname(os.path.realpath(__file__))
-TEMPLATES_PATH = os.path.abspath(os.path.join(FILE_PATH, 'templates'))
+TEMPLATES_PATH = Path(__file__).parent / 'templates'
 
 COLORS = {
     'green': ('#28A745', '#34D058'),
@@ -39,29 +38,26 @@ COLOR_RANGES = [
 ]
 
 
-def get_color(total):
+def get_color(total: int) -> str:
     for range_, color in COLOR_RANGES:
         if total >= range_:
             return COLORS[color]
 
-    return None
+    raise ValueError('total cannot be negative')
 
 
-def get_badge(total, color):
-    badge_template_path = os.path.join(TEMPLATES_PATH, 'badge.svg')
-    with open(badge_template_path, encoding='utf-8') as f:
-        template = f.read()
+def get_badge(total: int, color: str) -> str:
+    template = (TEMPLATES_PATH / 'badge.svg').read_text(encoding='utf-8')
     template = template.replace('{{ total }}', str(total))
     template = template.replace('{{ color_dark }}', color[0])
     return template.replace('{{ color_light }}', color[1])
 
 
-def save_badge(badge, outpath):
-    with open(os.path.join(outpath, 'badge.svg'), 'w', encoding='utf-8') as f:
-        f.write(badge)
+def save_badge(badge: str, outpath: Path) -> None:
+    (outpath / 'badge.svg').write_text(badge, encoding='utf-8')
 
 
-def make_badge(total, outpath):
+def make_badge(total: int, outpath: Path) -> None:
     color = get_color(total)
     badge = get_badge(total, color)
     save_badge(badge, outpath)

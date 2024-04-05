@@ -14,21 +14,15 @@ preview = true
 select = ["ALL"]
 ignore = [
     # These will eventually be enabled
-    "ANN",       # Type annotations
-    "T201",      # Use of print statements
     "D1",        # Docstring
     # These will not
-    "PLR09",     # Too many X variables
-    "SIM105",    # Use contextlib.supress
+    "COM812",    # Trailing comma missing
+    "CPY",       # Missing copyright
     "DTZ",       # Timezone in datetime
-    "PYI",       # Type hinting
-    "TID252",    # Prefer absolute imports
+    "EM101",     # Exception with string literal
     "RSE102",    # Unnecessary parentheses on raised exceptions
-    "TRY",
-    "EM",
-    "CPY",
-    "PTH",
-    "FURB101"
+    "TID252",    # Prefer absolute imports
+    "TRY003",    # Exception with custom text
 ]
 
 [lint.flake8-quotes]

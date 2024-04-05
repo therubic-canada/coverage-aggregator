@@ -4,7 +4,7 @@ package_name = 'coverage-aggregator'
 
 setup(
     name=package_name,
-    version='0.1.0',
+    version='0.1.1',
     description='Coverage report aggregator',
     packages=['coverage_aggregator'],
     install_requires=['setuptools', 'jinja2'],

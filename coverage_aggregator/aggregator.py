@@ -1,10 +1,11 @@
-from collections import namedtuple
+from __future__ import annotations
+
 from datetime import datetime
-import glob
-import os
+from pathlib import Path
 import re
 import shutil
 import sys
+from typing import NamedTuple
 
 from jinja2 import Environment, FileSystemLoader
 import pkg_resources
@@ -13,31 +14,27 @@ from .badge_generator import make_badge
 
 VERSION = pkg_resources.require('coverage-aggregator')[0].version
 
-FILE_PATH = os.path.dirname(os.path.realpath(__file__))
-TEMPLATES_PATH = os.path.abspath(os.path.join(FILE_PATH, 'templates'))
-STATIC_PATH = os.path.abspath(os.path.join(FILE_PATH, 'static'))
+FILE_PATH = Path(__file__).parent
+TEMPLATES_PATH = FILE_PATH / 'templates'
+STATIC_PATH = FILE_PATH / 'static'
 
 
-Score = namedtuple(
-    'Score',
-    [
-        'statements',
-        'missing',
-        'excluded',
-        'branches',
-        'partial',
-        'numerator',
-        'denominator',
-        'coverage',
-    ],
-)
+class Score(NamedTuple):
+    statements: int
+    missing: int
+    excluded: int
+    branches: int
+    partial: int
+    numerator: int
+    denominator: int
+    coverage: int
 
 
-def aggregate():
-    path = sys.argv[1]
-    outpath = sys.argv[2]
+def aggregate() -> None:
+    path = Path(sys.argv[1])
+    outpath = Path(sys.argv[2])
 
-    os.makedirs(outpath)
+    outpath.mkdir(parents=True)
     scores, total = aggregate_reports(path)
     copy_static(outpath)
     copy_reports(path, outpath)
@@ -45,17 +42,14 @@ def aggregate():
     make_badge(total.coverage, outpath)
 
 
-def aggregate_reports(path):
-    html_reports = sorted(glob.glob(os.path.join(path, '*', 'coverage.html')))
-    packages = sorted(
-        os.path.basename(os.path.dirname(p))
-        for p in html_reports
-    )
+def aggregate_reports(path: Path) -> tuple[Score, int]:
+    html_reports = sorted(path.glob('*/coverage.html'))
+    packages = [p.parent.name for p in html_reports]
     scores = {}
 
     total = [0] * 8
     for package, report in zip(packages, html_reports):
-        scores[package] = extract_score(os.path.join(report, 'index.html'))
+        scores[package] = extract_score(report / 'index.html')
         for i, s in enumerate(scores[package]):
             total[i] += s
     total[-1] = round(total[-3] / total[-2] * 100)
@@ -64,9 +58,8 @@ def aggregate_reports(path):
     return scores, total
 
 
-def extract_score(path):
-    with open(path, encoding='utf-8') as f:
-        text = f.read()
+def extract_score(path: Path) -> Score:
+    text = path.read_text(encoding='utf-8')
 
     regex = re.compile(
         r'<tr class="total">' + r'.*?(\d+)' * 8 + r'.*?</tr>',
@@ -76,28 +69,23 @@ def extract_score(path):
     return Score(*[int(match.group(i)) for i in range(1, 9)])
 
 
-def generate_index(scores, total, outpath):
+def generate_index(scores: dict[str, Score], total: int, outpath: Path) -> None:
     env = Environment(loader=FileSystemLoader(TEMPLATES_PATH), autoescape=True)
     template = env.get_template('index.html')
     date_string = datetime.now().strftime('%Y-%m-%d %H:%M')
     page = template.render(
-        scores=scores, total=total, date_string=date_string, version=VERSION)
-    with open(os.path.join(outpath, 'index.html'), 'w', encoding='utf-8') as f:
-        f.write(page)
+        scores=scores, total=total, date_string=date_string, version=VERSION
+    )
+    (outpath / 'index.html').write_text(page, encoding='utf-8')
 
 
-def copy_static(outpath):
-    files = os.listdir(STATIC_PATH)
-    for filename in files:
-        filepath = os.path.join(STATIC_PATH, filename)
-        if os.path.isfile(filepath):
-            shutil.copy(filepath, outpath)
+def copy_static(outpath: Path) -> None:
+    shutil.copytree(STATIC_PATH, outpath, dirs_exist_ok=True)
 
 
-def copy_reports(path, outpath):
-    html_reports = glob.glob(os.path.join(path, '*', 'coverage.html'))
-    packages = [os.path.basename(os.path.dirname(p)) for p in html_reports]
+def copy_reports(path: Path, outpath: Path) -> None:
+    html_reports = list(path.glob('*/coverage.html'))
+    packages = [p.parent.name for p in html_reports]
 
     for package, report in zip(packages, html_reports):
-        report_outpath = os.path.join(outpath, package)
-        shutil.copytree(report, report_outpath)
+        shutil.copytree(report, outpath / package)
