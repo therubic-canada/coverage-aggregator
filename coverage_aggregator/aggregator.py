@@ -39,7 +39,7 @@ def aggregate() -> None:
     copy_static(outpath)
     copy_reports(path, outpath)
     generate_index(scores, total, outpath)
-    make_badge(total.coverage, outpath)
+    make_badge(total.coverage, outpath / 'badge.svg')
 
 
 def aggregate_reports(path: Path) -> tuple[Score, int]:

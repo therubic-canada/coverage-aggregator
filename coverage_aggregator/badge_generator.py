@@ -17,7 +17,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import json
 from pathlib import Path
+import sys
 
 TEMPLATES_PATH = Path(__file__).parent / 'templates'
 
@@ -54,10 +56,21 @@ def get_badge(total: int, color: str) -> str:
 
 
 def save_badge(badge: str, outpath: Path) -> None:
-    (outpath / 'badge.svg').write_text(badge, encoding='utf-8')
+    outpath.write_text(badge, encoding='utf-8')
 
 
 def make_badge(total: int, outpath: Path) -> None:
     color = get_color(total)
     badge = get_badge(total, color)
     save_badge(badge, outpath)
+
+
+def generate() -> None:
+    path = Path(sys.argv[1])
+    outpath = Path(sys.argv[2])
+
+    with path.open() as f:
+        data = json.load(f)
+
+    total = int(data['totals']['percent_covered_display'])
+    make_badge(total, outpath)

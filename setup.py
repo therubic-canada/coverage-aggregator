@@ -4,7 +4,7 @@ package_name = 'coverage-aggregator'
 
 setup(
     name=package_name,
-    version='0.1.1',
+    version='0.2.0',
     description='Coverage report aggregator',
     packages=['coverage_aggregator'],
     install_requires=['setuptools', 'jinja2'],
@@ -16,6 +16,8 @@ setup(
         'console_scripts': [
             'aggregate-coverage-reports = '
             'coverage_aggregator.aggregator:aggregate',
+            'generate-coverage-badge = '
+            'coverage_aggregator.badge_generator:generate',
         ],
     },
 )
