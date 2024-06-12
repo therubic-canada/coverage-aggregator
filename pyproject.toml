@@ -1,14 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coverage-aggregator"
+version = "0.2.1"
+authors = [{name = "Auguste Lalande", email = "alal@therubic.com"}]
+description = "Coverage report aggregator."
+dependencies = ["setuptools", "jinja2"]
+
+[project.scripts]
+aggregate-coverage-reports = "coverage_aggregator.aggregator:aggregate"
+generate-coverage-badge = "coverage_aggregator.badge_generator:generate"
+
+[tool.setuptools]
+packages = ["coverage_aggregator"]
+zip-safe = true
+include-package-data = true
+
+[tool.ruff]
 line-length = 80
 indent-width = 4
 
 target-version = "py38"
 
-[format]
+[tool.ruff.format]
 quote-style = "single"
 indent-style = "space"
 line-ending = "auto"
 
-[lint]
+[tool.ruff.lint]
 preview = true
 
 select = ["ALL"]
@@ -25,15 +46,12 @@ ignore = [
     "TRY003",    # Exception with custom text
 ]
 
-[lint.flake8-quotes]
+[tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
 inline-quotes = "single"
 
-[lint.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[lint.isort]
+[tool.ruff.lint.isort]
 force-sort-within-sections = true
-
-[lint.per-file-ignores]
-"setup.py" = ["D1"]
