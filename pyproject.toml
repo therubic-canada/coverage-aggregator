@@ -18,6 +18,9 @@ packages = ["coverage_aggregator"]
 zip-safe = true
 include-package-data = true
 
+[tool.setuptools.package-data]
+coverage_aggregator = ["static/*", "templates/*"]
+
 [tool.ruff]
 line-length = 80
 indent-width = 4
