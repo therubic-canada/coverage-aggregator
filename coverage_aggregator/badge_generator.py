@@ -17,9 +17,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from __future__ import annotations
+
+import argparse
 import json
 from pathlib import Path
-import sys
 
 TEMPLATES_PATH = Path(__file__).parent / 'templates'
 
@@ -40,7 +42,7 @@ COLOR_RANGES = [
 ]
 
 
-def get_color(total: int) -> str:
+def get_color(total: int) -> tuple[str, str]:
     for range_, color in COLOR_RANGES:
         if total >= range_:
             return COLORS[color]
@@ -48,7 +50,7 @@ def get_color(total: int) -> str:
     raise ValueError('total cannot be negative')
 
 
-def get_badge(total: int, color: str) -> str:
+def get_badge(total: int, color: tuple[str, str]) -> str:
     template = (TEMPLATES_PATH / 'badge.svg').read_text(encoding='utf-8')
     template = template.replace('{{ total }}', str(total))
     template = template.replace('{{ color_dark }}', color[0])
@@ -66,11 +68,13 @@ def make_badge(total: int, outpath: Path) -> None:
 
 
 def generate() -> None:
-    path = Path(sys.argv[1])
-    outpath = Path(sys.argv[2])
+    parser = argparse.ArgumentParser(description='Generate a coverage badge.')
+    parser.add_argument('path', type=Path, help='Path to coverage JSON file')
+    parser.add_argument('outpath', type=Path, help='Output path for badge SVG')
+    args = parser.parse_args()
 
-    with path.open() as f:
+    with args.path.open() as f:
         data = json.load(f)
 
     total = int(data['totals']['percent_covered_display'])
-    make_badge(total, outpath)
+    make_badge(total, args.outpath)

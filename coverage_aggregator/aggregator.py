@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import argparse
 from datetime import datetime
 from pathlib import Path
 import re
 import shutil
-import sys
 from typing import NamedTuple
 
 from jinja2 import Environment, FileSystemLoader
@@ -31,21 +31,27 @@ class Score(NamedTuple):
 
 
 def aggregate() -> None:
-    path = Path(sys.argv[1])
-    outpath = Path(sys.argv[2])
+    parser = argparse.ArgumentParser(description='Aggregate coverage reports.')
+    parser.add_argument(
+        'path', type=Path, help='Path to coverage reports directory'
+    )
+    parser.add_argument(
+        'outpath', type=Path, help='Output path for aggregated report'
+    )
+    args = parser.parse_args()
 
-    outpath.mkdir(parents=True)
-    scores, total = aggregate_reports(path)
-    copy_static(outpath)
-    copy_reports(path, outpath)
-    generate_index(scores, total, outpath)
-    make_badge(total.coverage, outpath / 'badge.svg')
+    args.outpath.mkdir(parents=True)
+    scores, total = aggregate_reports(args.path)
+    copy_static(args.outpath)
+    copy_reports(args.path, args.outpath)
+    generate_index(scores, total, args.outpath)
+    make_badge(total.coverage, args.outpath / 'badge.svg')
 
 
-def aggregate_reports(path: Path) -> tuple[Score, int]:
+def aggregate_reports(path: Path) -> tuple[dict[str, Score], Score]:
     html_reports = sorted(path.glob('*/coverage.html'))
     packages = [p.parent.name for p in html_reports]
-    scores = {}
+    scores: dict[str, Score] = {}
 
     total = [0] * 8
     for package, report in zip(packages, html_reports):
@@ -69,7 +75,9 @@ def extract_score(path: Path) -> Score:
     return Score(*[int(match.group(i)) for i in range(1, 9)])
 
 
-def generate_index(scores: dict[str, Score], total: int, outpath: Path) -> None:
+def generate_index(
+    scores: dict[str, Score], total: Score, outpath: Path
+) -> None:
     env = Environment(loader=FileSystemLoader(TEMPLATES_PATH), autoescape=True)
     template = env.get_template('index.html')
     date_string = datetime.now().strftime('%Y-%m-%d %H:%M')
