@@ -2,17 +2,17 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+from importlib.metadata import version
 from pathlib import Path
 import re
 import shutil
 from typing import NamedTuple
 
 from jinja2 import Environment, FileSystemLoader
-import pkg_resources
 
 from .badge_generator import make_badge
 
-VERSION = pkg_resources.require('coverage-aggregator')[0].version
+VERSION = version('coverage-aggregator')
 
 FILE_PATH = Path(__file__).parent
 TEMPLATES_PATH = FILE_PATH / 'templates'
@@ -38,23 +38,34 @@ def aggregate() -> None:
     parser.add_argument(
         'outpath', type=Path, help='Output path for aggregated report'
     )
+    parser.add_argument(
+        '--ignore',
+        type=lambda s: s.split(','),
+        default=[],
+        metavar='PACKAGES',
+        help='Comma-separated list of packages to exclude from aggregation',
+    )
     args = parser.parse_args()
 
     args.outpath.mkdir(parents=True)
-    scores, total = aggregate_reports(args.path)
+    scores, total = aggregate_reports(args.path, args.ignore)
     copy_static(args.outpath)
-    copy_reports(args.path, args.outpath)
+    copy_reports(args.path, args.outpath, args.ignore)
     generate_index(scores, total, args.outpath)
     make_badge(total.coverage, args.outpath / 'badge.svg')
 
 
-def aggregate_reports(path: Path) -> tuple[dict[str, Score], Score]:
+def aggregate_reports(
+    path: Path, ignore: list[str] | None = None
+) -> tuple[dict[str, Score], Score]:
     html_reports = sorted(path.glob('*/coverage.html'))
     packages = [p.parent.name for p in html_reports]
     scores: dict[str, Score] = {}
 
     total = [0] * 8
     for package, report in zip(packages, html_reports):
+        if ignore and package in ignore:
+            continue
         scores[package] = extract_score(report / 'index.html')
         for i, s in enumerate(scores[package]):
             total[i] += s
@@ -91,9 +102,13 @@ def copy_static(outpath: Path) -> None:
     shutil.copytree(STATIC_PATH, outpath, dirs_exist_ok=True)
 
 
-def copy_reports(path: Path, outpath: Path) -> None:
+def copy_reports(
+    path: Path, outpath: Path, ignore: list[str] | None = None
+) -> None:
     html_reports = list(path.glob('*/coverage.html'))
     packages = [p.parent.name for p in html_reports]
 
     for package, report in zip(packages, html_reports):
+        if ignore and package in ignore:
+            continue
         shutil.copytree(report, outpath / package)

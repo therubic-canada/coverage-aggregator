@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "coverage-aggregator"
-version = "0.2.1"
+version = "0.2.2"
 authors = [{name = "Auguste Lalande", email = "alal@therubic.com"}]
 description = "Coverage report aggregator."
-dependencies = ["setuptools", "jinja2"]
+dependencies = ["jinja2"]
 
 [project.scripts]
 aggregate-coverage-reports = "coverage_aggregator.aggregator:aggregate"
